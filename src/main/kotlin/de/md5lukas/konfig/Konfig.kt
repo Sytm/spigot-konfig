@@ -9,15 +9,36 @@ import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 
+/**
+ * Helper class to deserialize Bukkit configurations into any config instance with reflection.
+ *
+ * By default the following types are supported:
+ * - String
+ * - Boolean
+ * - Byte
+ * - Short
+ * - Int
+ * - Long
+ * - Float
+ * - Double
+ *  - These types as List<>
+ * - List<Char>
+ *
+ * @constructor Creates a new Konfig instance with additional custom [RegisteredTypeAdapter]s
+ * @property customAdapters The adapters to register
+ */
 class Konfig(
-    private val customAdapters: List<RegisteredTypeAdapter<out Any>> = emptyList()
+    private val customAdapters: List<RegisteredTypeAdapter<out Any>>
 ) {
 
     companion object {
-        private val instance = Konfig()
+        private val instance = Konfig(emptyList())
 
-        fun deserializeInto(bukkitConfig: ConfigurationSection, configObject: Any) {
-            instance.deserializeInto(bukkitConfig, configObject)
+        /**
+         * Deserializes the provided [ConfigurationSection] into the config instance.
+         */
+        fun deserializeInto(bukkitConfig: ConfigurationSection, configInstance: Any) {
+            instance.deserializeInto(bukkitConfig, configInstance)
         }
     }
 
@@ -41,20 +62,24 @@ class Konfig(
         DoubleListAdapter,
     )
 
-    fun deserializeInto(bukkitConfig: ConfigurationSection, configObject: Any) {
-        visitClass(bukkitConfig, configObject)
+    /**
+     * Deserializes the provided [ConfigurationSection] into the config instance taking custom [RegisteredTypeAdapter]s
+     * into account.
+     */
+    fun deserializeInto(bukkitConfig: ConfigurationSection, configInstance: Any) {
+        visitClass(bukkitConfig, configInstance)
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun visitClass(section: ConfigurationSection, configObject: Any) {
-        val clazz = configObject::class
+    private fun visitClass(section: ConfigurationSection, configInstance: Any) {
+        val clazz = configInstance::class
 
         clazz.memberProperties.forEach { property ->
             property as KProperty1<Any, Any>
             val propertyClass = property.returnType.classifier as? KClass<*>
                 ?: throw IllegalStateException("The property ${property.name} in ${clazz.qualifiedName} has a type that is not available in Kotlin")
 
-            val path = property.findAnnotation<ConfigPath>()?.key ?: property.name
+            val path = property.findAnnotation<ConfigPath>()?.path ?: property.name
 
             if (!section.contains(path)) {
                 throw MissingConfigurationKeyException(section, path)
@@ -63,7 +88,7 @@ class Konfig(
             if (propertyClass.hasAnnotation<Configurable>()) {
                 visitClass(
                     validateNotNull(section, path, section.getConfigurationSection(path)),
-                    property.get(configObject)
+                    property.get(configInstance)
                 )
                 return@forEach
             }
@@ -85,7 +110,7 @@ class Konfig(
                     throw NullPointerException("The returned value for ${property.name} in ${clazz.qualifiedName} is null for a non-null type")
                 }
 
-                property.setter.call(configObject, value)
+                property.setter.call(configInstance, value)
                 return@forEach
             }
         }
