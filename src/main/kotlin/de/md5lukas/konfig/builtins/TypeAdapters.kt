@@ -4,6 +4,7 @@ import de.md5lukas.konfig.RegisteredTypeAdapter
 import org.bukkit.configuration.ConfigurationSection
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.full.isSuperclassOf
 
 internal object StringAdapter : RegisteredTypeAdapter.Static<String>(String::class) {
     override fun get(section: ConfigurationSection, path: String): String? = section.getString(path)
@@ -90,4 +91,23 @@ internal object DoubleListAdapter : RegisteredTypeAdapter<List<Double>> {
     override fun get(section: ConfigurationSection, path: String): List<Double> = section.getDoubleList(path)
     override fun isApplicable(clazz: KClass<*>, typeArgumentClasses: List<KClass<*>>) =
         clazz.isSubclassOf(List::class) && Double::class == typeArgumentClasses.firstOrNull()
+}
+
+internal object EnumAdapter : RegisteredTypeAdapter<Enum<*>> {
+    @Suppress("UNCHECKED_CAST")
+    override fun get(
+        section: ConfigurationSection,
+        path: String,
+        clazz: KClass<*>,
+        typeArgumentClasses: List<KClass<*>>
+    ) = (clazz.java.enumConstants as Array<Enum<*>>).firstOrNull {
+        it.name.equals(
+            section.getString(path),
+            true,
+        )
+    }
+
+    override fun isApplicable(clazz: KClass<*>, typeArgumentClasses: List<KClass<*>>): Boolean {
+        return Enum::class.isSuperclassOf(clazz)
+    }
 }

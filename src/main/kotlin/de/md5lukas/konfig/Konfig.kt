@@ -24,6 +24,7 @@ import kotlin.reflect.jvm.isAccessible
  * - Double
  *  - These types as List<>
  * - List<Char>
+ * - Enums
  *
  * @constructor Creates a new Konfig instance with additional custom [RegisteredTypeAdapter]s
  * @property customAdapters The adapters to register
@@ -61,6 +62,7 @@ class Konfig(
         LongListAdapter,
         FloatListAdapter,
         DoubleListAdapter,
+        EnumAdapter,
     )
 
     /**
@@ -96,16 +98,20 @@ class Konfig(
 
             if (property is KMutableProperty1) {
                 val useAdapter = property.findAnnotation<UseAdapter>()
+                val typeArguments = property.returnType.arguments.mapNotNull { it.type?.classifier as? KClass<*> }
                 val adapter = if (useAdapter !== null) {
                     useAdapter.adapter.objectInstance
                         ?: throw IllegalArgumentException("The property ${property.name} in ${clazz.qualifiedName} has an custom TypeAdapter that is not an object")
                 } else {
-                    val typeArguments = property.returnType.arguments.map { it.type?.classifier as? KClass<*> }.filterNotNull()
                     getTypeAdapter(propertyClass, typeArguments)
                         ?: throw IllegalArgumentException("Could not find a TypeAdapter for ${property.name} in ${clazz.qualifiedName}")
                 }
 
-                val value = adapter.get(section, path)
+                val value = if (adapter is RegisteredTypeAdapter) {
+                    adapter.get(section, path, propertyClass, typeArguments)
+                } else {
+                    adapter.get(section, path)
+                }
 
                 if (value === null && !property.returnType.isMarkedNullable) {
                     throw NullPointerException("The returned value for ${property.name} in ${clazz.qualifiedName} is null for a non-null type")

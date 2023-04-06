@@ -1,5 +1,6 @@
 package de.md5lukas.konfig
 
+import org.bukkit.configuration.ConfigurationSection
 import kotlin.reflect.KClass
 
 /**
@@ -8,6 +9,22 @@ import kotlin.reflect.KClass
  * Instead of marking a lot of properties of the same type with [UseAdapter], this type adapter is preferred
  */
 interface RegisteredTypeAdapter<T> : TypeAdapter<T> {
+
+    /**
+     * If this method returns a null value for a property that is not marked as nullable, a [NullPointerException]
+     * will be thrown
+     *
+     * @param section The ConfigurationSection to read from
+     * @param path The path in the ConfigurationSection to use
+     * @param clazz The runtime class of the property
+     * @param typeArgumentClasses The runtime type argument classes of the property
+     * @return The parsed Object
+     */
+    fun get(section: ConfigurationSection, path: String, clazz: KClass<*>, typeArgumentClasses: List<KClass<*>>) =
+        get(section, path)
+
+    override fun get(section: ConfigurationSection, path: String): T? =
+        throw NotImplementedError()
 
     /**
      * Function that gets called with the class of the property and its type argument classes

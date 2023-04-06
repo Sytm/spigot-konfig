@@ -189,4 +189,35 @@ class KonfigTest {
         @ConfigPath("anotherPath")
         lateinit var someString: String
     }
+
+    @Test
+    fun enums() {
+        val yaml = loadConfiguration("enums.yml")
+        val config = Enums()
+
+        Konfig.deserializeInto(yaml, config)
+
+        assertEquals(AnEnum.VALUE1, config.first)
+        assertEquals(AnEnum.VALUE2, config.second)
+    }
+
+    @Test
+    fun enumsUnknown() {
+        val yaml = loadConfiguration("enums-unknown.yml")
+        val config = Enums()
+
+        assertThrows<NullPointerException> {
+            Konfig.deserializeInto(yaml, config)
+        }
+    }
+
+    class Enums {
+        lateinit var first: AnEnum
+        lateinit var second: AnEnum
+    }
+
+    enum class AnEnum {
+        VALUE1,
+        VALUE2,
+    }
 }
