@@ -111,3 +111,27 @@ internal object EnumAdapter : RegisteredTypeAdapter<Enum<*>> {
         return Enum::class.isSuperclassOf(clazz)
     }
 }
+
+internal object EnumListAdapter : RegisteredTypeAdapter<List<Enum<*>>> {
+    @Suppress("UNCHECKED_CAST")
+    override fun get(
+        section: ConfigurationSection,
+        path: String,
+        clazz: KClass<*>,
+        typeArgumentClasses: List<KClass<*>>
+    ) = (typeArgumentClasses.first().java.enumConstants as Array<Enum<*>>).let { constants ->
+        section.getStringList(path).map { name ->
+            constants.firstOrNull {
+                it.name.equals(
+                    name,
+                    true,
+                )
+            }
+                ?: throw IllegalArgumentException("$name does not exist in Enum ${typeArgumentClasses.first().qualifiedName}")
+        }
+    }
+
+    override fun isApplicable(clazz: KClass<*>, typeArgumentClasses: List<KClass<*>>): Boolean {
+        return clazz.isSubclassOf(List::class) && Enum::class.isSuperclassOf(typeArgumentClasses.first())
+    }
+}

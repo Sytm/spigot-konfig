@@ -1,2 +1,7 @@
 first: VALUE1
 second: VALUE2
+
+aList:
+  - VALUE1
+  - VALUE2
+  - VALUE1

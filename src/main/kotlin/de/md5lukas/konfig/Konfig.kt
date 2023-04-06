@@ -25,6 +25,7 @@ import kotlin.reflect.jvm.isAccessible
  *  - These types as List<>
  * - List<Char>
  * - Enums
+ * - List<Enums>
  *
  * @constructor Creates a new Konfig instance with additional custom [RegisteredTypeAdapter]s
  * @property customAdapters The adapters to register
@@ -63,6 +64,7 @@ class Konfig(
         FloatListAdapter,
         DoubleListAdapter,
         EnumAdapter,
+        EnumListAdapter,
     )
 
     /**

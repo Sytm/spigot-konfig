@@ -199,6 +199,7 @@ class KonfigTest {
 
         assertEquals(AnEnum.VALUE1, config.first)
         assertEquals(AnEnum.VALUE2, config.second)
+        assertEquals(listOf(AnEnum.VALUE1, AnEnum.VALUE2, AnEnum.VALUE1), config.aList)
     }
 
     @Test
@@ -214,6 +215,8 @@ class KonfigTest {
     class Enums {
         lateinit var first: AnEnum
         lateinit var second: AnEnum
+
+        lateinit var aList: List<AnEnum>
     }
 
     enum class AnEnum {
