@@ -18,7 +18,7 @@ dependencies {
     val junitVersion: String by project
 
     api(kotlin("stdlib-jdk8"))
-    api ("org.spigotmc:spigot-api:$spigotVersion")
+    api("org.spigotmc:spigot-api:$spigotVersion")
 
     implementation(kotlin("reflect"))
 
@@ -39,7 +39,10 @@ val sourcesJar by tasks.creating(Jar::class) {
 val dokkaHtml by tasks.getting(DokkaTask::class) {
     dokkaSourceSets {
         configureEach {
-            externalDocumentationLink("https://hub.spigotmc.org/javadocs/spigot/", "https://hub.spigotmc.org/javadocs/spigot/element-list")
+            externalDocumentationLink(
+                "https://hub.spigotmc.org/javadocs/spigot/",
+                "https://hub.spigotmc.org/javadocs/spigot/element-list"
+            )
         }
     }
 }
@@ -55,11 +58,15 @@ publishing {
         maven {
             name = "md5lukasReposilite"
 
-            url = uri("https://repo.md5lukas.de/${if (version.toString().endsWith("-SNAPSHOT")) {
-                "snapshots"
-            } else {
-                "releases"
-            }}")
+            url = uri(
+                "https://repo.md5lukas.de/${
+                    if (version.toString().endsWith("-SNAPSHOT")) {
+                        "snapshots"
+                    } else {
+                        "releases"
+                    }
+                }"
+            )
 
             credentials(PasswordCredentials::class)
             authentication {

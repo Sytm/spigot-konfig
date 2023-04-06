@@ -8,6 +8,7 @@ import kotlin.reflect.KProperty1
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
 
 /**
  * Helper class to deserialize Bukkit configurations into any config instance with reflection.
@@ -110,7 +111,13 @@ class Konfig(
                     throw NullPointerException("The returned value for ${property.name} in ${clazz.qualifiedName} is null for a non-null type")
                 }
 
-                property.setter.call(configInstance, value)
+                val setter = property.setter
+
+                if (!setter.isAccessible) {
+                    setter.isAccessible = true
+                }
+
+                setter.call(configInstance, value)
                 return@forEach
             }
         }
