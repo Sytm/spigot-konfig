@@ -1,0 +1,13 @@
+aString: "Hello World?"
+
+nested:
+  aString: "Hello World!"
+
+  aBoolean: true
+
+  aByte: 123
+  aShort: 12345
+  anInt: 12345678
+  aLong: 12345678910
+  aFloat: 125.257
+  aDouble: 496205.593

@@ -1,0 +1,2 @@
+normalString: "Hello World!"
+nullableString: "This will be ignored by deserializer"
