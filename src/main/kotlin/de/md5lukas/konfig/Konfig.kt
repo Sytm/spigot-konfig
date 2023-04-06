@@ -9,9 +9,19 @@ import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 
-object Konfig {
+class Konfig(
+    private val customAdapters: List<RegisteredTypeAdapter<out Any>> = emptyList()
+) {
 
-    val builtInTypes = listOf(
+    companion object {
+        private val instance = Konfig()
+
+        fun deserializeInto(bukkitConfig: ConfigurationSection, configObject: Any) {
+            instance.deserializeInto(bukkitConfig, configObject)
+        }
+    }
+
+    private val builtInTypes = listOf(
         StringAdapter,
         BooleanAdapter,
         ByteAdapter,
@@ -89,5 +99,6 @@ object Konfig {
     }
 
     private fun getTypeAdapter(clazz: KClass<*>, firstTypeArgument: KClass<*>?): TypeAdapter<*>? =
-        builtInTypes.firstOrNull { it.isApplicable(clazz, firstTypeArgument) }
+        customAdapters.firstOrNull { it.isApplicable(clazz, firstTypeArgument) }
+            ?: builtInTypes.firstOrNull { it.isApplicable(clazz, firstTypeArgument) }
 }
