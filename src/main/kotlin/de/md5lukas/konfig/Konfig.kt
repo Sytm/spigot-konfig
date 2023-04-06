@@ -15,6 +15,7 @@ import kotlin.reflect.jvm.isAccessible
  *
  * By default the following types are supported:
  * - String
+ * - Char
  * - Boolean
  * - Byte
  * - Short
@@ -47,6 +48,7 @@ class Konfig(
 
     private val builtInTypes = listOf(
         StringAdapter,
+        CharAdapter,
         BooleanAdapter,
         ByteAdapter,
         ShortAdapter,

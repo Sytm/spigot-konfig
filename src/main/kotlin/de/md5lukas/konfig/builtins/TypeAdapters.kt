@@ -10,6 +10,10 @@ internal object StringAdapter : RegisteredTypeAdapter.Static<String>(String::cla
     override fun get(section: ConfigurationSection, path: String): String? = section.getString(path)
 }
 
+internal object CharAdapter : RegisteredTypeAdapter.Static<Char>(Char::class) {
+    override fun get(section: ConfigurationSection, path: String): Char? = section.getString(path)?.firstOrNull()
+}
+
 internal object BooleanAdapter : RegisteredTypeAdapter.Static<Boolean>(Boolean::class) {
     override fun get(section: ConfigurationSection, path: String): Boolean = section.getBoolean(path)
 }
