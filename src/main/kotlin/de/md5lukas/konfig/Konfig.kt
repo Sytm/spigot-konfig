@@ -11,6 +11,26 @@ import kotlin.reflect.full.memberProperties
 
 object Konfig {
 
+    val builtInTypes = listOf(
+        StringAdapter,
+        BooleanAdapter,
+        ByteAdapter,
+        ShortAdapter,
+        IntAdapter,
+        LongAdapter,
+        FloatAdapter,
+        DoubleAdapter,
+        StringListAdapter,
+        BooleanListAdapter,
+        ByteListAdapter,
+        ShortListAdapter,
+        IntListAdapter,
+        CharListAdapter,
+        LongListAdapter,
+        FloatListAdapter,
+        DoubleListAdapter,
+    )
+
     fun deserializeInto(bukkitConfig: ConfigurationSection, configObject: Any) {
         try {
             visitClass(bukkitConfig, configObject)
@@ -68,30 +88,6 @@ object Konfig {
         }
     }
 
-    private fun getTypeAdapter(clazz: KClass<*>, firstTypeArgument: KClass<*>?): TypeAdapter<*>? {
-        return when (clazz) {
-            in String::class -> StringAdapter
-            in Boolean::class -> BooleanAdapter
-            in Byte::class -> ByteAdapter
-            in Short::class -> ShortAdapter
-            in Int::class -> IntAdapter
-            in Long::class -> LongAdapter
-            in Float::class -> FloatAdapter
-            in Double::class -> DoubleAdapter
-            in List::class -> when (firstTypeArgument) {
-                in String::class -> StringListAdapter
-                in Boolean::class -> BooleanListAdapter
-                in Byte::class -> ByteListAdapter
-                in Short::class -> ShortListAdapter
-                in Int::class -> IntListAdapter
-                in Char::class -> CharListAdapter
-                in Long::class -> LongListAdapter
-                in Float::class -> FloatListAdapter
-                in Double::class -> DoubleListAdapter
-                else -> null
-            }
-
-            else -> null
-        }
-    }
+    private fun getTypeAdapter(clazz: KClass<*>, firstTypeArgument: KClass<*>?): TypeAdapter<*>? =
+        builtInTypes.firstOrNull { it.isApplicable(clazz, firstTypeArgument) }
 }
