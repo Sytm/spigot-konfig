@@ -29,3 +29,19 @@ annotation class ConfigPath(
 annotation class UseAdapter(
     val adapter: KClass<out TypeAdapter<*>>
 )
+
+/**
+ * Properties with this annotation will be skipped
+ */
+@Target(AnnotationTarget.PROPERTY)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class SkipConfig
+
+/**
+ * Properties with this annotation will get set to the raw [org.bukkit.configuration.ConfigurationSection]
+ */
+@Target(AnnotationTarget.PROPERTY)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class ExportConfigurationSection(
+    val root: Boolean = false
+)

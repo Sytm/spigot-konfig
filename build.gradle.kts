@@ -18,9 +18,8 @@ dependencies {
     val junitVersion: String by project
 
     api(kotlin("stdlib-jdk8"))
+    api(kotlin("reflect"))
     api("org.spigotmc:spigot-api:$spigotVersion")
-
-    implementation(kotlin("reflect"))
 
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")

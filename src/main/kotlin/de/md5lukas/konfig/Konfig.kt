@@ -84,6 +84,26 @@ class Konfig(
             val propertyClass = property.returnType.classifier as? KClass<*>
                 ?: throw IllegalStateException("The property ${property.name} in ${clazz.qualifiedName} has a type that is not available in Kotlin")
 
+            if (property.hasAnnotation<SkipConfig>()) {
+                return@forEach
+            }
+
+            val exportConfigurationSection = property.findAnnotation<ExportConfigurationSection>()?.root
+
+            if (exportConfigurationSection !== null) {
+                if (property is KMutableProperty1) {
+                    property.forcedSetterSet(
+                        configInstance, if (exportConfigurationSection) {
+                            section.root!!
+                        } else {
+                            section
+                        }
+                    )
+                } else {
+                    throw IllegalArgumentException("The property ${property.name} in ${clazz.qualifiedName} must be mutable to receive the ConfigurationSection")
+                }
+            }
+
             val path = property.findAnnotation<ConfigPath>()?.path ?: property.name
 
             if (!section.contains(path)) {
@@ -119,13 +139,7 @@ class Konfig(
                     throw NullPointerException("The returned value for ${property.name} in ${clazz.qualifiedName} is null for a non-null type")
                 }
 
-                val setter = property.setter
-
-                if (!setter.isAccessible) {
-                    setter.isAccessible = true
-                }
-
-                setter.call(configInstance, value)
+                property.forcedSetterSet(configInstance, value)
                 return@forEach
             }
         }
@@ -134,4 +148,12 @@ class Konfig(
     private fun getTypeAdapter(clazz: KClass<*>, typeArgumentClasses: List<KClass<*>>): TypeAdapter<*>? =
         customAdapters.firstOrNull { it.isApplicable(clazz, typeArgumentClasses) }
             ?: builtInTypes.firstOrNull { it.isApplicable(clazz, typeArgumentClasses) }
+
+    private fun <T, V> KMutableProperty1<out T, out V>.forcedSetterSet(instance: T, value: V) {
+        if (!setter.isAccessible) {
+            setter.isAccessible = true
+        }
+
+        setter.call(instance, value)
+    }
 }
