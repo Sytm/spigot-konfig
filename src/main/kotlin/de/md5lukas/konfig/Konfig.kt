@@ -74,8 +74,8 @@ class Konfig(
                     useAdapter.adapter.objectInstance
                         ?: throw IllegalArgumentException("The property ${property.name} in ${clazz.qualifiedName} has an custom TypeAdapter that is not an object")
                 } else {
-                    val typeArgument = property.returnType.arguments.firstOrNull()?.type?.classifier as? KClass<*>
-                    getTypeAdapter(propertyClass, typeArgument)
+                    val typeArguments = property.returnType.arguments.map { it.type?.classifier as? KClass<*> }.filterNotNull()
+                    getTypeAdapter(propertyClass, typeArguments)
                         ?: throw IllegalArgumentException("Could not find a TypeAdapter for ${property.name} in ${clazz.qualifiedName}")
                 }
 
@@ -91,7 +91,7 @@ class Konfig(
         }
     }
 
-    private fun getTypeAdapter(clazz: KClass<*>, firstTypeArgumentClass: KClass<*>?): TypeAdapter<*>? =
-        customAdapters.firstOrNull { it.isApplicable(clazz, firstTypeArgumentClass) }
-            ?: builtInTypes.firstOrNull { it.isApplicable(clazz, firstTypeArgumentClass) }
+    private fun getTypeAdapter(clazz: KClass<*>, typeArgumentClasses: List<KClass<*>>): TypeAdapter<*>? =
+        customAdapters.firstOrNull { it.isApplicable(clazz, typeArgumentClasses) }
+            ?: builtInTypes.firstOrNull { it.isApplicable(clazz, typeArgumentClasses) }
 }

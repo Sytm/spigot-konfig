@@ -40,54 +40,54 @@ internal object DoubleAdapter : RegisteredTypeAdapter.Static<Double>(Double::cla
 internal object StringListAdapter : RegisteredTypeAdapter<List<String>> {
     override fun get(section: ConfigurationSection, path: String): List<String> = section.getStringList(path)
 
-    override fun isApplicable(clazz: KClass<*>, firstTypeArgumentClass: KClass<*>?) =
-        clazz.isSubclassOf(List::class) && String::class == firstTypeArgumentClass
+    override fun isApplicable(clazz: KClass<*>, typeArgumentClasses: List<KClass<*>>) =
+        clazz.isSubclassOf(List::class) && String::class == typeArgumentClasses.firstOrNull()
 }
 
 internal object BooleanListAdapter : RegisteredTypeAdapter<List<Boolean>> {
     override fun get(section: ConfigurationSection, path: String): List<Boolean> = section.getBooleanList(path)
-    override fun isApplicable(clazz: KClass<*>, firstTypeArgumentClass: KClass<*>?) =
-        clazz.isSubclassOf(List::class) && Boolean::class == firstTypeArgumentClass
+    override fun isApplicable(clazz: KClass<*>, typeArgumentClasses: List<KClass<*>>) =
+        clazz.isSubclassOf(List::class) && Boolean::class == typeArgumentClasses.firstOrNull()
 }
 
 internal object ByteListAdapter : RegisteredTypeAdapter<List<Byte>> {
     override fun get(section: ConfigurationSection, path: String): List<Byte> = section.getByteList(path)
-    override fun isApplicable(clazz: KClass<*>, firstTypeArgumentClass: KClass<*>?) =
-        clazz.isSubclassOf(List::class) && Byte::class == firstTypeArgumentClass
+    override fun isApplicable(clazz: KClass<*>, typeArgumentClasses: List<KClass<*>>) =
+        clazz.isSubclassOf(List::class) && Byte::class == typeArgumentClasses.firstOrNull()
 }
 
 internal object ShortListAdapter : RegisteredTypeAdapter<List<Short>> {
     override fun get(section: ConfigurationSection, path: String): List<Short> = section.getShortList(path)
-    override fun isApplicable(clazz: KClass<*>, firstTypeArgumentClass: KClass<*>?) =
-        clazz.isSubclassOf(List::class) && Short::class == firstTypeArgumentClass
+    override fun isApplicable(clazz: KClass<*>, typeArgumentClasses: List<KClass<*>>) =
+        clazz.isSubclassOf(List::class) && Short::class == typeArgumentClasses.firstOrNull()
 }
 
 internal object IntListAdapter : RegisteredTypeAdapter<List<Int>> {
     override fun get(section: ConfigurationSection, path: String): List<Int> = section.getIntegerList(path)
-    override fun isApplicable(clazz: KClass<*>, firstTypeArgumentClass: KClass<*>?) =
-        clazz.isSubclassOf(List::class) && Int::class == firstTypeArgumentClass
+    override fun isApplicable(clazz: KClass<*>, typeArgumentClasses: List<KClass<*>>) =
+        clazz.isSubclassOf(List::class) && Int::class == typeArgumentClasses.firstOrNull()
 }
 
 internal object CharListAdapter : RegisteredTypeAdapter<List<Char>> {
     override fun get(section: ConfigurationSection, path: String): List<Char> = section.getCharacterList(path)
-    override fun isApplicable(clazz: KClass<*>, firstTypeArgumentClass: KClass<*>?) =
-        clazz.isSubclassOf(List::class) && Char::class == firstTypeArgumentClass
+    override fun isApplicable(clazz: KClass<*>, typeArgumentClasses: List<KClass<*>>) =
+        clazz.isSubclassOf(List::class) && Char::class == typeArgumentClasses.firstOrNull()
 }
 
 internal object LongListAdapter : RegisteredTypeAdapter<List<Long>> {
     override fun get(section: ConfigurationSection, path: String): List<Long> = section.getLongList(path)
-    override fun isApplicable(clazz: KClass<*>, firstTypeArgumentClass: KClass<*>?) =
-        clazz.isSubclassOf(List::class) && Long::class == firstTypeArgumentClass
+    override fun isApplicable(clazz: KClass<*>, typeArgumentClasses: List<KClass<*>>) =
+        clazz.isSubclassOf(List::class) && Long::class == typeArgumentClasses.firstOrNull()
 }
 
 internal object FloatListAdapter : RegisteredTypeAdapter<List<Float>> {
     override fun get(section: ConfigurationSection, path: String): List<Float> = section.getFloatList(path)
-    override fun isApplicable(clazz: KClass<*>, firstTypeArgumentClass: KClass<*>?) =
-        clazz.isSubclassOf(List::class) && Float::class == firstTypeArgumentClass
+    override fun isApplicable(clazz: KClass<*>, typeArgumentClasses: List<KClass<*>>) =
+        clazz.isSubclassOf(List::class) && Float::class == typeArgumentClasses.firstOrNull()
 }
 
 internal object DoubleListAdapter : RegisteredTypeAdapter<List<Double>> {
     override fun get(section: ConfigurationSection, path: String): List<Double> = section.getDoubleList(path)
-    override fun isApplicable(clazz: KClass<*>, firstTypeArgumentClass: KClass<*>?) =
-        clazz.isSubclassOf(List::class) && Double::class == firstTypeArgumentClass
+    override fun isApplicable(clazz: KClass<*>, typeArgumentClasses: List<KClass<*>>) =
+        clazz.isSubclassOf(List::class) && Double::class == typeArgumentClasses.firstOrNull()
 }
