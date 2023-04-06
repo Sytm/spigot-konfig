@@ -1,6 +1,6 @@
 package de.md5lukas.konfig
 
-import de.md5lukas.konfig.adapters.*
+import de.md5lukas.konfig.builtins.*
 import org.bukkit.configuration.ConfigurationSection
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
@@ -42,14 +42,7 @@ class Konfig(
     )
 
     fun deserializeInto(bukkitConfig: ConfigurationSection, configObject: Any) {
-        try {
-            visitClass(bukkitConfig, configObject)
-        } catch (e: Exception) {
-            if (e is ConfigurationException) {
-                throw e
-            }
-            throw ConfigurationException("An error occurred trying to deserialize config", e)
-        }
+        visitClass(bukkitConfig, configObject)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -98,7 +91,7 @@ class Konfig(
         }
     }
 
-    private fun getTypeAdapter(clazz: KClass<*>, firstTypeArgument: KClass<*>?): TypeAdapter<*>? =
-        customAdapters.firstOrNull { it.isApplicable(clazz, firstTypeArgument) }
-            ?: builtInTypes.firstOrNull { it.isApplicable(clazz, firstTypeArgument) }
+    private fun getTypeAdapter(clazz: KClass<*>, firstTypeArgumentClass: KClass<*>?): TypeAdapter<*>? =
+        customAdapters.firstOrNull { it.isApplicable(clazz, firstTypeArgumentClass) }
+            ?: builtInTypes.firstOrNull { it.isApplicable(clazz, firstTypeArgumentClass) }
 }

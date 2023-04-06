@@ -1,4 +1,4 @@
-package de.md5lukas.konfig.adapters
+package de.md5lukas.konfig
 
 import org.bukkit.configuration.ConfigurationSection
 

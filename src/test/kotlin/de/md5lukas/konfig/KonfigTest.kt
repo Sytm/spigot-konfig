@@ -1,6 +1,5 @@
 package de.md5lukas.konfig
 
-import de.md5lukas.konfig.adapters.TypeAdapter
 import org.bukkit.configuration.ConfigurationSection
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -127,7 +126,7 @@ class KonfigTest {
         val yaml = loadConfiguration("nullable.yml")
         val config = NullableTypesThrows()
 
-        assertThrows<ConfigurationException> {
+        assertThrows<NullPointerException> {
             Konfig.deserializeInto(yaml, config)
         }
 

@@ -1,6 +1,5 @@
 package de.md5lukas.konfig
 
-import de.md5lukas.konfig.adapters.TypeAdapter
 import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.CLASS)
