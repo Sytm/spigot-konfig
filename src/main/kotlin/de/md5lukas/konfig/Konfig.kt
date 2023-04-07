@@ -69,12 +69,18 @@ class Konfig(
         EnumListAdapter,
     )
 
+    private val adapterCache = mutableMapOf<KClass<*>, TypeAdapter<out Any>>()
+
     /**
      * Deserializes the provided [ConfigurationSection] into the config instance taking custom [RegisteredTypeAdapter]s
      * into account.
      */
     fun deserializeInto(bukkitConfig: ConfigurationSection, configInstance: Any) {
-        visitClass(bukkitConfig, configInstance)
+        try {
+            visitClass(bukkitConfig, configInstance)
+        } finally {
+            adapterCache.clear()
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -90,29 +96,32 @@ class Konfig(
                 return@forEach
             }
 
+            val path = property.findAnnotation<ConfigPath>()?.path ?: property.name
             val exportConfigurationSection = property.findAnnotation<ExportConfigurationSection>()?.root
 
             if (exportConfigurationSection !== null) {
-                if (property is KMutableProperty1) {
-                    property.forcedSetterSet(
-                        configInstance, if (exportConfigurationSection) {
-                            section.root!!
-                        } else {
-                            section
-                        }
-                    )
-                } else {
+                if (property !is KMutableProperty1) {
                     throw IllegalArgumentException("The property ${property.name} in ${clazz.qualifiedName} must be mutable to receive the ConfigurationSection")
                 }
+                if (propertyClass != ConfigurationSection::class) {
+                    throw IllegalArgumentException("The property ${property.name} in ${clazz.qualifiedName} must be of type ConfigurationSection")
+                }
+
+                property.forcedSetterSet(
+                    configInstance, if (exportConfigurationSection) {
+                        section.root!!
+                    } else {
+                        section.getConfigurationSection(path)
+                    }
+                )
+                return@forEach
             }
 
-            val path = property.findAnnotation<ConfigPath>()?.path ?: property.name
-
-            if (!section.contains(path)) {
-                throw MissingConfigurationKeyException(section, path)
-            }
 
             if (propertyClass.hasAnnotation<Configurable>()) {
+                if (!section.contains(path)) {
+                    throw MissingConfigurationKeyException(section, path)
+                }
                 visitClass(
                     validateNotNull(section, path, section.getConfigurationSection(path)),
                     property.get(configInstance)
@@ -121,11 +130,19 @@ class Konfig(
             }
 
             if (property is KMutableProperty1) {
+                if (!section.contains(path)) {
+                    if (property.returnType.isMarkedNullable) {
+                        property.forcedSetterSet(configInstance, null)
+                        return@forEach
+                    } else {
+                        throw MissingConfigurationKeyException(section, path)
+                    }
+                }
+
                 val useAdapter = property.findAnnotation<UseAdapter>()
                 val typeArguments = property.returnType.arguments.mapNotNull { it.type?.classifier as? KClass<*> }
                 val adapter = if (useAdapter !== null) {
-                    useAdapter.adapter.objectInstance
-                        ?: throw IllegalArgumentException("The property ${property.name} in ${clazz.qualifiedName} has an custom TypeAdapter that is not an object")
+                    getAdapterInstance(useAdapter.adapter)
                 } else {
                     getTypeAdapter(propertyClass, typeArguments)
                         ?: throw IllegalArgumentException("Could not find a TypeAdapter for ${property.name} in ${clazz.qualifiedName}")
@@ -157,5 +174,17 @@ class Konfig(
         }
 
         setter.call(instance, value)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun getAdapterInstance(clazz: KClass<*>): TypeAdapter<out Any> = adapterCache.computeIfAbsent(clazz) {
+        val constructor = it.constructors.firstOrNull { constructor -> constructor.parameters.isEmpty() }
+            ?: throw IllegalArgumentException("The class ${clazz.qualifiedName} has no zero-parameter constructor")
+
+        if (!constructor.isAccessible) {
+            constructor.isAccessible = true
+        }
+
+        constructor.call() as TypeAdapter<out Any>
     }
 }

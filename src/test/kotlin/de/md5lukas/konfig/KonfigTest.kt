@@ -96,7 +96,7 @@ class KonfigTest {
         lateinit var doubleList: List<Double>
     }
 
-    object NullAdapter : TypeAdapter<String> {
+    private class NullAdapter : TypeAdapter<String> {
         override fun get(section: ConfigurationSection, path: String): String? = null
     }
 
@@ -222,5 +222,35 @@ class KonfigTest {
     enum class AnEnum {
         VALUE1,
         VALUE2,
+    }
+
+    @Test
+    fun exportConfiguration() {
+        val yaml = loadConfiguration("nested.yml")
+        val config = ExportConfiguration()
+
+        Konfig.deserializeInto(yaml, config)
+
+        assertEquals(yaml, config.root)
+        assertEquals(yaml.getConfigurationSection("nested"), config.nested)
+        assertEquals(yaml, config.noBackingField)
+    }
+
+    class ExportConfiguration {
+        @ExportConfigurationSection(true)
+        lateinit var root: ConfigurationSection
+
+        @ExportConfigurationSection
+        lateinit var nested: ConfigurationSection
+
+        @SkipConfig
+        var skippedRoot: ConfigurationSection? = null
+
+        @ExportConfigurationSection(true)
+        var noBackingField: ConfigurationSection?
+            set(value) {
+                skippedRoot = value
+            }
+            get() = skippedRoot
     }
 }
