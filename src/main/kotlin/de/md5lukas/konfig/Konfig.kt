@@ -44,6 +44,19 @@ class Konfig(
         fun deserializeInto(bukkitConfig: ConfigurationSection, configInstance: Any) {
             instance.deserializeInto(bukkitConfig, configInstance)
         }
+
+        inline fun <reified T> preloadClasses() = preloadClasses(T::class)
+
+        fun preloadClasses(clazz: KClass<*>) {
+            clazz.memberProperties.forEach { property ->
+                val propertyClass = property.returnType.classifier as? KClass<*>
+                    ?: throw IllegalStateException("The property ${property.name} in ${clazz.qualifiedName} has a type that is not available in Kotlin")
+
+                if (propertyClass.hasAnnotation<Configurable>()) {
+                    preloadClasses(propertyClass)
+                }
+            }
+        }
     }
 
     private val builtInTypes = listOf(
