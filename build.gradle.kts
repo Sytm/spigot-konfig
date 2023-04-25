@@ -1,4 +1,5 @@
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.8.20"
@@ -13,7 +14,7 @@ repositories {
     maven(url = "https://oss.sonatype.org/content/groups/public/")
 }
 
-dependencies {
+dependencies { // kotlinx jvm metadata
     val spigotVersion: String by project
     val junitVersion: String by project
 
@@ -28,6 +29,13 @@ dependencies {
 kotlin {
     val jvmTarget: String by project
     jvmToolchain(jvmTarget.toInt())
+}
+
+tasks.withType<KotlinCompile> {
+    compilerOptions.freeCompilerArgs.addAll(
+        "-Xjvm-default=all",
+        "-Xlambdas=indy",
+    )
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
