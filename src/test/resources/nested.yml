@@ -3,6 +3,8 @@ aString: "Hello World?"
 nested:
   aString: "Hello World!"
 
+  aChar: "Only the first letter"
+
   aBoolean: true
 
   aByte: 123

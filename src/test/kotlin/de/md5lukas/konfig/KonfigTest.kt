@@ -31,6 +31,8 @@ class KonfigTest {
     private fun verifyNormalTypes(instance: NormalTypes) = with(instance) {
         assertEquals("Hello World!", aString)
 
+        assertEquals('O', aChar)
+
         assertEquals(true, aBoolean)
 
         assertEquals(123, aByte)
@@ -45,6 +47,8 @@ class KonfigTest {
     class NormalTypes {
 
         lateinit var aString: String
+
+        var aChar = Char.MIN_VALUE
 
         var aBoolean = false
 
@@ -208,6 +212,16 @@ class KonfigTest {
         val config = Enums()
 
         assertThrows<NullPointerException> {
+            Konfig.deserializeInto(yaml, config)
+        }
+    }
+
+    @Test
+    fun enumsUnknownList() {
+        val yaml = loadConfiguration("enums-unknown-list.yml")
+        val config = Enums()
+
+        assertThrows<IllegalArgumentException> {
             Konfig.deserializeInto(yaml, config)
         }
     }
